@@ -90,36 +90,17 @@ namespace BIADKNXLightingDA {
                     loggingBox.AppendText("Device '" + agilorConnectDeviceName.Text + "' is been connected!\r\n");
                     return;
                 }
-
-                //if ((bool)connectAgilorDB.Tag) {
-                //    // 已经连接 Agilor
-                //    if (rtdb != null) rtdb.Close();
-                //    rtdb = null;
-
-                //    connectAgilorDB.Text = "Connect";
-                //    loggingBox.AppendText("Agilor Disconnect Success." + "\r\n");
-                //    connectAgilorDB.Tag = false;
-                //} else {
-                //    // 未连接 Agilor
-                //    rtdb = RTDB.Instance(agilorConnectDeviceName.Text, agilorConnectIP.Text);
-                //    rtdb.ValueReceived += Rtdb_ValueReceived;
-
-                //    connectAgilorDB.Text = "Disconnect";
-                //    loggingBox.AppendText("Agilor Connect Success." + "\r\n");
-                //    connectAgilorDB.Tag = true;
-                //}
             } catch (Exception ex) {
                 loggingBox.AppendText("ERROR:" + ex.ToString() + "\r\n");
             }
         }
 
         private void Rtdb_ValueReceived(Agilor.Interface.Val.Value value) {
-
-            if (needReloadConfig) {
+            if (needReloadConfig)
+            {
                 ReloadConfigFile();
             }
 
-            // 输出到控制台
             var msg = "RECEIVED:\r\n"
                     + "Name:" + value.Name + "\r\n"
                     + "Type:" + value.Type + "\r\n"
@@ -129,53 +110,37 @@ namespace BIADKNXLightingDA {
                     + "\r\n";
             loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { msg });
 
-            // 写入到数据库
-            string deviceName = null;
             try
             {
                 foreach (var device in rtdbs)
                 {
                     if (device.Value.WriteValue(value))
                     {
-                        deviceName = device.Key;
+                        if (value.Name.Contains("&"))
+                        {
+                            EIBA.Interop.Falcon.DeviceWriteError eError;
+                            eError = _ptrGroupDataTransfer.Write((object)AgilorSourceNameAndKNXGroupAddressConvert.getGroupAddressBySourceName(value.Name),
+                              (EIBA.Interop.Falcon.Priority)_nGroupDataWritePriority_config,
+                              _nGroupDataWriteRoutingCount_config,
+                              less7bitsFlag[device.Key],
+                              (object)(value.Val.ToString()));
+
+                            // extended error information
+                            if (eError != EIBA.Interop.Falcon.DeviceWriteError.DeviceWriteErrorNoError)
+                            {
+                                // error message
+                                loggingBox.AppendText("Error: group data write error\r\n");
+                                //MessageBox.Show("Error: group data write error");
+                            }
+                        }
                         break;
                     }
                 }
-
-                if(deviceName == null)
-                {
-                    loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Write To Agilor DB Error: No device can write this point:' " + value.Name + " '!\r\n" });
-                    //MessageBox.Show("Rtdb_ValueReceived: write to agilor error!");
-                    return;
-                }
-                //rtdb.WriteValue(value);
             }
             catch (Exception ex)
             {
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Write To Agilor DB Error: No device can write this point:' " + value.Name + " '!\r\n" + ex.ToString() + "\r\n" });
-                //MessageBox.Show("Rtdb_ValueReceived: write to agilor error!");
-                return;
-            }
-
-            // 写入到设备
-            try {
-                EIBA.Interop.Falcon.DeviceWriteError eError;
-                eError = _ptrGroupDataTransfer.Write((object)AgilorSourceNameAndKNXGroupAddressConvert.getGroupAddressBySourceName(value.Name),
-                  (EIBA.Interop.Falcon.Priority)_nGroupDataWritePriority_config,
-                  _nGroupDataWriteRoutingCount_config,
-                  //_bGroupDataWriteLessthan7bits_config ? true : false,
-                  less7bitsFlag[deviceName],
-                  (object)(value.Val.ToString()));
-                // extended error information
-                if (eError != EIBA.Interop.Falcon.DeviceWriteError.DeviceWriteErrorNoError) {
-                    // error message
-                    loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Error: group data write - 1 error\r\n" });
-                    //MessageBox.Show("Rtdb_ValueReceived: error, group data write error");
-                }
-            } catch (Exception ex){
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Write To KNX Error:\r\n" + ex.ToString() + "\r\n" });
-                //MessageBox.Show("Rtdb_ValueReceived: write to knx device error, " + ex.ToString());
-                return;
+                loggingBox.AppendText("Write To KNX Error:\r\n" + ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
