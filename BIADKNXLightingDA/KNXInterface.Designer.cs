@@ -63,6 +63,11 @@
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.agilorACIConnectPort = new System.Windows.Forms.TextBox();
+            this.checkBox_less7bitflag = new System.Windows.Forms.CheckBox();
+            this.disconnectAgilorDBALL = new System.Windows.Forms.Button();
+            this.disconnectAgilorDB = new System.Windows.Forms.Button();
             this.connectAgilorDBACI = new System.Windows.Forms.Button();
             this.connectAgilorDB = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -92,13 +97,14 @@
             this.agilorRWTargetName = new System.Windows.Forms.TextBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.kNXWriteConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sourcenameGroupAddressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.disconnectAgilorDB = new System.Windows.Forms.Button();
-            this.disconnectAgilorDBALL = new System.Windows.Forms.Button();
-            this.checkBox_less7bitflag = new System.Windows.Forms.CheckBox();
+            this.aCIConnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rTDBConnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rTDBDisconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.rTDBDisconnectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -109,6 +115,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.agilorACIConnectPort);
             this.groupBox1.Controls.Add(this.checkBox_less7bitflag);
             this.groupBox1.Controls.Add(this.disconnectAgilorDBALL);
             this.groupBox1.Controls.Add(this.disconnectAgilorDB);
@@ -120,37 +128,86 @@
             this.groupBox1.Controls.Add(this.agilorConnectPort);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.agilorConnectIP);
-            this.groupBox1.Location = new System.Drawing.Point(12, 46);
+            this.groupBox1.Location = new System.Drawing.Point(12, 37);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(454, 155);
+            this.groupBox1.Size = new System.Drawing.Size(559, 143);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Agilor";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(281, 59);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(73, 13);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "RTDB PORT:";
+            // 
+            // agilorACIConnectPort
+            // 
+            this.agilorACIConnectPort.Enabled = false;
+            this.agilorACIConnectPort.Location = new System.Drawing.Point(365, 19);
+            this.agilorACIConnectPort.Name = "agilorACIConnectPort";
+            this.agilorACIConnectPort.Size = new System.Drawing.Size(56, 20);
+            this.agilorACIConnectPort.TabIndex = 11;
+            this.agilorACIConnectPort.Text = "900";
+            this.agilorACIConnectPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // checkBox_less7bitflag
+            // 
+            this.checkBox_less7bitflag.AutoSize = true;
+            this.checkBox_less7bitflag.Location = new System.Drawing.Point(62, 82);
+            this.checkBox_less7bitflag.Name = "checkBox_less7bitflag";
+            this.checkBox_less7bitflag.Size = new System.Drawing.Size(104, 17);
+            this.checkBox_less7bitflag.TabIndex = 10;
+            this.checkBox_less7bitflag.Text = "Less Than 7 bits";
+            this.checkBox_less7bitflag.UseVisualStyleBackColor = true;
+            // 
+            // disconnectAgilorDBALL
+            // 
+            this.disconnectAgilorDBALL.Location = new System.Drawing.Point(284, 105);
+            this.disconnectAgilorDBALL.Name = "disconnectAgilorDBALL";
+            this.disconnectAgilorDBALL.Size = new System.Drawing.Size(199, 23);
+            this.disconnectAgilorDBALL.TabIndex = 9;
+            this.disconnectAgilorDBALL.Text = "RTDB Disconnect ALL";
+            this.disconnectAgilorDBALL.UseVisualStyleBackColor = true;
+            this.disconnectAgilorDBALL.Click += new System.EventHandler(this.disconnectAgilorDBALL_Click);
+            // 
+            // disconnectAgilorDB
+            // 
+            this.disconnectAgilorDB.Location = new System.Drawing.Point(62, 105);
+            this.disconnectAgilorDB.Name = "disconnectAgilorDB";
+            this.disconnectAgilorDB.Size = new System.Drawing.Size(199, 23);
+            this.disconnectAgilorDB.TabIndex = 8;
+            this.disconnectAgilorDB.Text = "RTDB Disconnect";
+            this.disconnectAgilorDB.UseVisualStyleBackColor = true;
+            this.disconnectAgilorDB.Click += new System.EventHandler(this.disconnectAgilorDB_Click);
+            // 
             // connectAgilorDBACI
             // 
-            this.connectAgilorDBACI.Location = new System.Drawing.Point(270, 53);
+            this.connectAgilorDBACI.Location = new System.Drawing.Point(446, 17);
             this.connectAgilorDBACI.Name = "connectAgilorDBACI";
             this.connectAgilorDBACI.Size = new System.Drawing.Size(99, 23);
             this.connectAgilorDBACI.TabIndex = 7;
-            this.connectAgilorDBACI.Text = "ACI-Connect";
+            this.connectAgilorDBACI.Text = "ACI Connect";
             this.connectAgilorDBACI.UseVisualStyleBackColor = true;
             this.connectAgilorDBACI.Click += new System.EventHandler(this.connectAgilorDBACI_Click);
             // 
             // connectAgilorDB
             // 
-            this.connectAgilorDB.Location = new System.Drawing.Point(62, 113);
+            this.connectAgilorDB.Location = new System.Drawing.Point(446, 54);
             this.connectAgilorDB.Name = "connectAgilorDB";
-            this.connectAgilorDB.Size = new System.Drawing.Size(98, 23);
+            this.connectAgilorDB.Size = new System.Drawing.Size(99, 23);
             this.connectAgilorDB.TabIndex = 6;
-            this.connectAgilorDB.Text = "Connect";
+            this.connectAgilorDB.Text = "RTDB Connect";
             this.connectAgilorDB.UseVisualStyleBackColor = true;
             this.connectAgilorDB.Click += new System.EventHandler(this.connectAgilorDB_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 58);
+            this.label3.Location = new System.Drawing.Point(7, 59);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 5;
@@ -158,28 +215,28 @@
             // 
             // agilorConnectDeviceName
             // 
-            this.agilorConnectDeviceName.Location = new System.Drawing.Point(62, 55);
+            this.agilorConnectDeviceName.Location = new System.Drawing.Point(62, 56);
             this.agilorConnectDeviceName.Name = "agilorConnectDeviceName";
             this.agilorConnectDeviceName.Size = new System.Drawing.Size(199, 20);
             this.agilorConnectDeviceName.TabIndex = 4;
-            this.agilorConnectDeviceName.Text = "KNX_LOCAL_TEST";
+            this.agilorConnectDeviceName.Text = "BIAD_LIGHT_DEVICES";
             this.agilorConnectDeviceName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(281, 22);
+            this.label2.Location = new System.Drawing.Point(294, 22);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 13);
+            this.label2.Size = new System.Drawing.Size(60, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "PORT:";
+            this.label2.Text = "ACI PORT:";
             // 
             // agilorConnectPort
             // 
             this.agilorConnectPort.Enabled = false;
-            this.agilorConnectPort.Location = new System.Drawing.Point(327, 19);
+            this.agilorConnectPort.Location = new System.Drawing.Point(365, 56);
             this.agilorConnectPort.Name = "agilorConnectPort";
-            this.agilorConnectPort.Size = new System.Drawing.Size(76, 20);
+            this.agilorConnectPort.Size = new System.Drawing.Size(56, 20);
             this.agilorConnectPort.TabIndex = 2;
             this.agilorConnectPort.Text = "700";
             this.agilorConnectPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -204,19 +261,19 @@
             // 
             // loggingBox
             // 
-            this.loggingBox.Location = new System.Drawing.Point(12, 458);
+            this.loggingBox.Location = new System.Drawing.Point(12, 426);
             this.loggingBox.MaxLength = 0;
             this.loggingBox.Multiline = true;
             this.loggingBox.Name = "loggingBox";
             this.loggingBox.ReadOnly = true;
             this.loggingBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.loggingBox.Size = new System.Drawing.Size(454, 256);
+            this.loggingBox.Size = new System.Drawing.Size(559, 186);
             this.loggingBox.TabIndex = 1;
             this.loggingBox.TextChanged += new System.EventHandler(this.loggingBox_TextChanged);
             // 
             // clearLoggingBox
             // 
-            this.clearLoggingBox.Location = new System.Drawing.Point(12, 429);
+            this.clearLoggingBox.Location = new System.Drawing.Point(12, 397);
             this.clearLoggingBox.Name = "clearLoggingBox";
             this.clearLoggingBox.Size = new System.Drawing.Size(75, 23);
             this.clearLoggingBox.TabIndex = 7;
@@ -227,9 +284,9 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.tabControl1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 222);
+            this.groupBox2.Location = new System.Drawing.Point(12, 192);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(454, 190);
+            this.groupBox2.Size = new System.Drawing.Size(559, 190);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "KNX Inerface";
@@ -241,7 +298,7 @@
             this.tabControl1.Location = new System.Drawing.Point(10, 19);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(438, 165);
+            this.tabControl1.Size = new System.Drawing.Size(535, 165);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -252,14 +309,14 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(430, 139);
+            this.tabPage1.Size = new System.Drawing.Size(527, 139);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "KNX";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // knxGroupDataRead
             // 
-            this.knxGroupDataRead.Location = new System.Drawing.Point(102, 79);
+            this.knxGroupDataRead.Location = new System.Drawing.Point(157, 80);
             this.knxGroupDataRead.Name = "knxGroupDataRead";
             this.knxGroupDataRead.Size = new System.Drawing.Size(97, 23);
             this.knxGroupDataRead.TabIndex = 13;
@@ -269,7 +326,7 @@
             // 
             // knxGroupDataWrite
             // 
-            this.knxGroupDataWrite.Location = new System.Drawing.Point(215, 79);
+            this.knxGroupDataWrite.Location = new System.Drawing.Point(270, 80);
             this.knxGroupDataWrite.Name = "knxGroupDataWrite";
             this.knxGroupDataWrite.Size = new System.Drawing.Size(97, 23);
             this.knxGroupDataWrite.TabIndex = 12;
@@ -279,7 +336,7 @@
             // 
             // selectKNXInterface
             // 
-            this.selectKNXInterface.Location = new System.Drawing.Point(102, 28);
+            this.selectKNXInterface.Location = new System.Drawing.Point(157, 29);
             this.selectKNXInterface.Name = "selectKNXInterface";
             this.selectKNXInterface.Size = new System.Drawing.Size(210, 23);
             this.selectKNXInterface.TabIndex = 1;
@@ -302,7 +359,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(430, 139);
+            this.tabPage2.Size = new System.Drawing.Size(527, 139);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Agilor";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -310,7 +367,7 @@
             // linkLabel_writeConfig
             // 
             this.linkLabel_writeConfig.AutoSize = true;
-            this.linkLabel_writeConfig.Location = new System.Drawing.Point(243, 52);
+            this.linkLabel_writeConfig.Location = new System.Drawing.Point(290, 51);
             this.linkLabel_writeConfig.Name = "linkLabel_writeConfig";
             this.linkLabel_writeConfig.Size = new System.Drawing.Size(65, 13);
             this.linkLabel_writeConfig.TabIndex = 22;
@@ -320,7 +377,7 @@
             // 
             // agilorACIWriteTarget
             // 
-            this.agilorACIWriteTarget.Location = new System.Drawing.Point(336, 47);
+            this.agilorACIWriteTarget.Location = new System.Drawing.Point(383, 46);
             this.agilorACIWriteTarget.Name = "agilorACIWriteTarget";
             this.agilorACIWriteTarget.Size = new System.Drawing.Size(75, 23);
             this.agilorACIWriteTarget.TabIndex = 21;
@@ -336,7 +393,7 @@
             "STRING",
             "FLOAT",
             "BOOL"});
-            this.agilorWTargetValyeType.Location = new System.Drawing.Point(98, 83);
+            this.agilorWTargetValyeType.Location = new System.Drawing.Point(145, 82);
             this.agilorWTargetValyeType.Name = "agilorWTargetValyeType";
             this.agilorWTargetValyeType.Size = new System.Drawing.Size(210, 43);
             this.agilorWTargetValyeType.TabIndex = 20;
@@ -344,7 +401,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(28, 87);
+            this.label8.Location = new System.Drawing.Point(75, 86);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(64, 13);
             this.label8.TabIndex = 19;
@@ -352,7 +409,7 @@
             // 
             // agilorWriteTarget
             // 
-            this.agilorWriteTarget.Location = new System.Drawing.Point(336, 103);
+            this.agilorWriteTarget.Location = new System.Drawing.Point(383, 102);
             this.agilorWriteTarget.Name = "agilorWriteTarget";
             this.agilorWriteTarget.Size = new System.Drawing.Size(75, 23);
             this.agilorWriteTarget.TabIndex = 17;
@@ -362,7 +419,7 @@
             // 
             // agilorReadTarget
             // 
-            this.agilorReadTarget.Location = new System.Drawing.Point(336, 12);
+            this.agilorReadTarget.Location = new System.Drawing.Point(383, 11);
             this.agilorReadTarget.Name = "agilorReadTarget";
             this.agilorReadTarget.Size = new System.Drawing.Size(75, 23);
             this.agilorReadTarget.TabIndex = 14;
@@ -373,7 +430,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(55, 52);
+            this.label6.Location = new System.Drawing.Point(102, 51);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(37, 13);
             this.label6.TabIndex = 16;
@@ -381,7 +438,7 @@
             // 
             // agilorWTargetValue
             // 
-            this.agilorWTargetValue.Location = new System.Drawing.Point(98, 49);
+            this.agilorWTargetValue.Location = new System.Drawing.Point(145, 48);
             this.agilorWTargetValue.Name = "agilorWTargetValue";
             this.agilorWTargetValue.Size = new System.Drawing.Size(129, 20);
             this.agilorWTargetValue.TabIndex = 15;
@@ -390,7 +447,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(20, 17);
+            this.label7.Location = new System.Drawing.Point(67, 16);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(72, 13);
             this.label7.TabIndex = 13;
@@ -398,7 +455,7 @@
             // 
             // agilorRWTargetName
             // 
-            this.agilorRWTargetName.Location = new System.Drawing.Point(98, 14);
+            this.agilorRWTargetName.Location = new System.Drawing.Point(145, 13);
             this.agilorRWTargetName.Name = "agilorRWTargetName";
             this.agilorRWTargetName.Size = new System.Drawing.Size(210, 20);
             this.agilorRWTargetName.TabIndex = 12;
@@ -411,25 +468,23 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(479, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(585, 25);
             this.toolStrip1.TabIndex = 9;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.connectToolStripMenuItem});
+            this.aCIConnectToolStripMenuItem,
+            this.rTDBConnectToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.rTDBDisconnectToolStripMenuItem,
+            this.rTDBDisconnectToolStripMenuItem1});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.Size = new System.Drawing.Size(68, 22);
             this.toolStripDropDownButton1.Text = "Agilor";
-            // 
-            // connectToolStripMenuItem
-            // 
-            this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
-            this.connectToolStripMenuItem.Text = "Connect";
             // 
             // toolStripDropDownButton2
             // 
@@ -456,41 +511,44 @@
             this.sourcenameGroupAddressToolStripMenuItem.Text = "SourcenameToGroupAddress";
             this.sourcenameGroupAddressToolStripMenuItem.Click += new System.EventHandler(this.sourcenameGroupAddressToolStripMenuItem_Click);
             // 
-            // disconnectAgilorDB
+            // aCIConnectToolStripMenuItem
             // 
-            this.disconnectAgilorDB.Location = new System.Drawing.Point(166, 113);
-            this.disconnectAgilorDB.Name = "disconnectAgilorDB";
-            this.disconnectAgilorDB.Size = new System.Drawing.Size(98, 23);
-            this.disconnectAgilorDB.TabIndex = 8;
-            this.disconnectAgilorDB.Text = "Disconnect";
-            this.disconnectAgilorDB.UseVisualStyleBackColor = true;
-            this.disconnectAgilorDB.Click += new System.EventHandler(this.disconnectAgilorDB_Click);
+            this.aCIConnectToolStripMenuItem.Name = "aCIConnectToolStripMenuItem";
+            this.aCIConnectToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.aCIConnectToolStripMenuItem.Text = "ACI Connect";
+            this.aCIConnectToolStripMenuItem.Click += new System.EventHandler(this.connectAgilorDBACI_Click);
             // 
-            // disconnectAgilorDBALL
+            // rTDBConnectToolStripMenuItem
             // 
-            this.disconnectAgilorDBALL.Location = new System.Drawing.Point(270, 113);
-            this.disconnectAgilorDBALL.Name = "disconnectAgilorDBALL";
-            this.disconnectAgilorDBALL.Size = new System.Drawing.Size(99, 23);
-            this.disconnectAgilorDBALL.TabIndex = 9;
-            this.disconnectAgilorDBALL.Text = "Disconnect ALL";
-            this.disconnectAgilorDBALL.UseVisualStyleBackColor = true;
-            this.disconnectAgilorDBALL.Click += new System.EventHandler(this.disconnectAgilorDBALL_Click);
+            this.rTDBConnectToolStripMenuItem.Name = "rTDBConnectToolStripMenuItem";
+            this.rTDBConnectToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.rTDBConnectToolStripMenuItem.Text = "RTDB Connect";
+            this.rTDBConnectToolStripMenuItem.Click += new System.EventHandler(this.connectAgilorDB_Click);
             // 
-            // checkBox_less7bitflag
+            // rTDBDisconnectToolStripMenuItem
             // 
-            this.checkBox_less7bitflag.AutoSize = true;
-            this.checkBox_less7bitflag.Location = new System.Drawing.Point(62, 87);
-            this.checkBox_less7bitflag.Name = "checkBox_less7bitflag";
-            this.checkBox_less7bitflag.Size = new System.Drawing.Size(104, 17);
-            this.checkBox_less7bitflag.TabIndex = 10;
-            this.checkBox_less7bitflag.Text = "Less Than 7 bits";
-            this.checkBox_less7bitflag.UseVisualStyleBackColor = true;
+            this.rTDBDisconnectToolStripMenuItem.Name = "rTDBDisconnectToolStripMenuItem";
+            this.rTDBDisconnectToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.rTDBDisconnectToolStripMenuItem.Text = "RTDB Disconnect";
+            this.rTDBDisconnectToolStripMenuItem.Click += new System.EventHandler(this.disconnectAgilorDB_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            // 
+            // rTDBDisconnectToolStripMenuItem1
+            // 
+            this.rTDBDisconnectToolStripMenuItem1.Name = "rTDBDisconnectToolStripMenuItem1";
+            this.rTDBDisconnectToolStripMenuItem1.Size = new System.Drawing.Size(181, 22);
+            this.rTDBDisconnectToolStripMenuItem1.Text = "RTDB Disconnect All";
+            this.rTDBDisconnectToolStripMenuItem1.Click += new System.EventHandler(this.disconnectAgilorDBALL_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(479, 726);
+            this.ClientSize = new System.Drawing.Size(585, 632);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.clearLoggingBox);
@@ -545,7 +603,6 @@
         private System.Windows.Forms.LinkLabel linkLabel_writeConfig;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
-        private System.Windows.Forms.ToolStripMenuItem connectToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem kNXWriteConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sourcenameGroupAddressToolStripMenuItem;
@@ -553,6 +610,13 @@
         private System.Windows.Forms.Button disconnectAgilorDB;
         private System.Windows.Forms.Button disconnectAgilorDBALL;
         private System.Windows.Forms.CheckBox checkBox_less7bitflag;
+        private System.Windows.Forms.TextBox agilorACIConnectPort;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ToolStripMenuItem aCIConnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rTDBConnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem rTDBDisconnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rTDBDisconnectToolStripMenuItem1;
     }
 }
 

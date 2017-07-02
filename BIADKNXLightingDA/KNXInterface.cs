@@ -77,7 +77,7 @@ namespace BIADKNXLightingDA {
                 if (!rtdbs.ContainsKey(agilorConnectDeviceName.Text))
                 {
                     // 准备连接 Agilor
-                    RTDB rtdb = RTDB.Instance(agilorConnectDeviceName.Text, agilorConnectIP.Text);
+                    RTDB rtdb = RTDB.Instance(agilorConnectDeviceName.Text, agilorConnectIP.Text, int.Parse(agilorConnectPort.Text));
                     rtdb.ValueReceived += Rtdb_ValueReceived;
 
                     rtdbs[agilorConnectDeviceName.Text] = rtdb;
@@ -823,16 +823,18 @@ namespace BIADKNXLightingDA {
                     if (aci != null) aci.Close();
                     aci = null;
 
-                    connectAgilorDBACI.Text = "ACI-Connect";
+                    connectAgilorDBACI.Text = "ACI Connect";
+                    aCIConnectToolStripMenuItem.Text = "ACI Connect";
                     loggingBox.AppendText("Agilor ACI Disconnect Success." + "\r\n");
                     connectAgilorDBACI.Tag = false;
                 }
                 else
                 {
                     // 未连接 Agilor
-                    aci = ACI.Instance("READWRITETARGET", agilorConnectIP.Text);
+                    aci = ACI.Instance("READWRITETARGET", agilorConnectIP.Text, int.Parse(agilorACIConnectPort.Text));
 
-                    connectAgilorDBACI.Text = "ACI-Disconnect";
+                    connectAgilorDBACI.Text = "ACI Disconnect";
+                    aCIConnectToolStripMenuItem.Text = "ACI Disconnect";
                     loggingBox.AppendText("Agilor ACI Connect Success." + "\r\n");
                     connectAgilorDBACI.Tag = true;
                 }

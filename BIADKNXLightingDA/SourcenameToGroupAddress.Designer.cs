@@ -130,6 +130,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "SourcenameToGroupAddress";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "SourcenameToGroupAddress";
             this.ResumeLayout(false);
             this.PerformLayout();
