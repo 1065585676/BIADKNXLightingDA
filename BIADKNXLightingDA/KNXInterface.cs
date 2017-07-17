@@ -20,10 +20,19 @@ namespace BIADKNXLightingDA {
         public static bool needReloadConfig = false;
 
         private ACI aci = null;
-        //private RTDB rtdb = null;
+        private RTDB rtdb = null;
 
-        public static Dictionary<string, RTDB> rtdbs = new Dictionary<string, RTDB>();
-        public static Dictionary<string, bool> less7bitsFlag = new Dictionary<string, bool>();
+        // MySQL
+        private string mysqlConnectStr;
+        MySqlConnection mysqlConn = null;
+        MySqlDataAdapter mysqlAdapter = null;
+        DataSet mysqlDataSet = new DataSet();
+        // Mysql Configuration
+        public string mysql_server_ip;
+        public string mysql_user_id;
+        public string mysql_password;
+        public string mysql_database_name;
+        public string mysql_table_name;
 
         //FalconInterfacesLib._GUID m_guidEdi; GUID for Falcon
         System.Guid m_guidEdi;
@@ -66,30 +75,53 @@ namespace BIADKNXLightingDA {
             _sGroupDataWriteGroupAddress = "";
             _bGroupDataWriteLessthan7bits = false;
 
+            mysql_server_ip = "127.0.0.1";
+            mysql_user_id = "ibms";
+            mysql_password = "toor";
+            mysql_database_name = "ibmsappdb";
+            mysql_table_name = "knx_device";
 
+            connectAgilorDB.Tag = false;
             connectAgilorDBACI.Tag = false;
             selectKNXInterface.Tag = false;
+
+            try
+            {
+                mysqlConnectStr = "Server="+ mysql_server_ip+
+                    ";User ID="+ mysql_user_id +
+                    ";Password="+ mysql_password + 
+                    ";Database="+ mysql_database_name + ";CharSet=utf8;";
+                if (mysqlConn == null) mysqlConn = new MySqlConnection(mysqlConnectStr);
+            } catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                Close();
+            }
         }
 
         private void connectAgilorDB_Click(object sender, EventArgs e) {
             try {
 
-                if (!rtdbs.ContainsKey(agilorConnectDeviceName.Text))
+                if ((bool)connectAgilorDB.Tag)
                 {
-                    // 准备连接 Agilor
-                    RTDB rtdb = RTDB.Instance(agilorConnectDeviceName.Text, agilorConnectIP.Text, int.Parse(agilorConnectPort.Text));
-                    rtdb.ValueReceived += Rtdb_ValueReceived;
+                    rtdb.ValueReceived -= Rtdb_ValueReceived;
+                    rtdb.Close();
 
-                    rtdbs[agilorConnectDeviceName.Text] = rtdb;
-                    less7bitsFlag[agilorConnectDeviceName.Text] = checkBox_less7bitflag.Checked;
-
-                    loggingBox.AppendText("Connect device '" + agilorConnectDeviceName.Text + "' finished!\r\n");
+                    connectAgilorDB.Text = "RTDB Connect";
+                    rTDBConnectToolStripMenuItem.Text = "RTDB Connect";
+                    loggingBox.AppendText("Disconnect device '" + agilorConnectDeviceName.Text + "' finished!\r\n");
+                    connectAgilorDB.Tag = false;
                 } else
                 {
-                    //MessageBox.Show("设备：'" + agilorConnectDeviceName.Text + "' 已经连接，重复的连接！");
-                    loggingBox.AppendText("Device '" + agilorConnectDeviceName.Text + "' is been connected!\r\n");
-                    return;
+                    rtdb = RTDB.Instance(agilorConnectDeviceName.Text, agilorConnectIP.Text, int.Parse(agilorConnectPort.Text));
+                    rtdb.ValueReceived += Rtdb_ValueReceived;
+
+                    connectAgilorDB.Text = "RTDB Disconnect";
+                    rTDBConnectToolStripMenuItem.Text = "RTDB Disconnect";
+                    loggingBox.AppendText("Connect device '" + agilorConnectDeviceName.Text + "' finished!\r\n");
+                    connectAgilorDB.Tag = true;
                 }
+
             } catch (Exception ex) {
                 loggingBox.AppendText("ERROR:" + ex.ToString() + "\r\n");
             }
@@ -100,6 +132,8 @@ namespace BIADKNXLightingDA {
             {
                 ReloadConfigFile();
             }
+
+            rtdb.WriteValue(value);
 
             var msg = "RECEIVED:\r\n"
                     + "Name:" + value.Name + "\r\n"
@@ -112,35 +146,41 @@ namespace BIADKNXLightingDA {
 
             try
             {
-                foreach (var device in rtdbs)
-                {
-                    if (device.Value.WriteValue(value))
-                    {
-                        if (value.Name.Contains("&"))
-                        {
-                            EIBA.Interop.Falcon.DeviceWriteError eError;
-                            eError = _ptrGroupDataTransfer.Write((object)AgilorSourceNameAndKNXGroupAddressConvert.getGroupAddressBySourceName(value.Name),
-                              (EIBA.Interop.Falcon.Priority)_nGroupDataWritePriority_config,
-                              _nGroupDataWriteRoutingCount_config,
-                              less7bitsFlag[device.Key],
-                              (object)(value.Val.ToString()));
+                // connect mysql to get agilor rtdb name
+                mysqlAdapter = new MySqlDataAdapter("select * from "+ mysql_table_name + " where agilor_rtdb_name = '" + value.Name + "'", mysqlConn);
+                mysqlDataSet.Clear();
+                mysqlAdapter.Fill(mysqlDataSet);
 
-                            // extended error information
-                            if (eError != EIBA.Interop.Falcon.DeviceWriteError.DeviceWriteErrorNoError)
-                            {
-                                // error message
-                                loggingBox.AppendText("Error: group data write error\r\n");
-                                //MessageBox.Show("Error: group data write error");
-                            }
-                        }
-                        break;
+                string agilor_aci_name = mysqlDataSet.Tables[0].Rows[0]["agilor_aci_name"].ToString();
+                if (agilor_aci_name.Contains("__"))
+                {
+                    string[] sArray = agilor_aci_name.Split(new string[] { "__" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (sArray.Length == 2)
+                    {
+                        rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
+                    }
+                }
+
+                string knx_group_address = mysqlDataSet.Tables[0].Rows[0]["knx_group_address"].ToString();
+                bool knx_value_less7bit = bool.Parse(mysqlDataSet.Tables[0].Rows[0]["knx_value_less7bit"].ToString());
+
+                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "MySQL Data:" + knx_group_address + ":" + knx_value_less7bit.ToString() + "\r\n" });
+
+                if (knx_group_address != "")
+                {
+                    EIBA.Interop.Falcon.DeviceWriteError eError;
+                    eError = _ptrGroupDataTransfer.Write((object)knx_group_address,
+                      (EIBA.Interop.Falcon.Priority)_nGroupDataWritePriority_config, _nGroupDataWriteRoutingCount_config, knx_value_less7bit, value.Val.ToString());
+                    // extended error information
+                    if (eError != EIBA.Interop.Falcon.DeviceWriteError.DeviceWriteErrorNoError)
+                    {
+                        loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Error: group data write error(" + knx_group_address + ")\r\n" });
                     }
                 }
             }
             catch (Exception ex)
             {
-                loggingBox.AppendText("Write To KNX Error:\r\n" + ex.ToString());
-                MessageBox.Show(ex.ToString());
+                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { "Write To KNX Error:\r\n" + ex.ToString() });
             }
         }
 
@@ -167,11 +207,12 @@ namespace BIADKNXLightingDA {
         
         private void agilorWriteTarget_Click(object sender, EventArgs e) {
             try {
-                //if (!(bool)connectAgilorDB.Tag) {
-                //    loggingBox.AppendText("ERROR: Agilor is disconnected! \r\n");
-                //    MessageBox.Show("Agilor is disconnected! \r\n", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //    return;
-                //}
+                if (!(bool)connectAgilorDB.Tag)
+                {
+                    loggingBox.AppendText("ERROR: Agilor is disconnected! \r\n");
+                    MessageBox.Show("Agilor is disconnected! \r\n", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 object val;
                 switch (agilorWTargetValyeType.SelectedItem.ToString()) {
                     case "LONG":
@@ -190,16 +231,7 @@ namespace BIADKNXLightingDA {
                         val = "";
                         break;
                 }
-                bool isSuccess = false;
-                foreach (var device in rtdbs)
-                {
-                    if (device.Value.WriteValue(new Agilor.Interface.Val.Value(agilorRWTargetName.Text, val)))
-                    {
-                        isSuccess = true;
-                        break;
-                    }
-                }
-                if (isSuccess)
+                if (rtdb.WriteValue(new Agilor.Interface.Val.Value(agilorRWTargetName.Text, val)))
                 {
                     loggingBox.AppendText("WRITE:\r\n"
                     + "Name:" + agilorRWTargetName.Text + "\r\n"
@@ -208,10 +240,8 @@ namespace BIADKNXLightingDA {
                     + "\r\n");
                 } else
                 {
-                    //MessageBox.Show("No device can write this point: '" + agilorRWTargetName.Text + "'!\r\n");
                     loggingBox.AppendText("No device can write this point: '" + agilorRWTargetName.Text + "'!\r\n");
                 }
-                //rtdb.WriteValue(new Agilor.Interface.Val.Value(agilorRWTargetName.Text, val));
             } catch (Exception ex) {
                 loggingBox.AppendText("ERROR:" + ex.ToString() + "\r\n");
             }
@@ -425,7 +455,6 @@ namespace BIADKNXLightingDA {
                         if (eError != EIBA.Interop.Falcon.DeviceWriteError.DeviceWriteErrorNoError) {
                             // error message
                             loggingBox.AppendText("knxGroupDataWrite_Click: error, group data write error\r\n");
-                            //MessageBox.Show("knxGroupDataWrite_Click: error, group data write error");
                         }
                     }
                 } else {
@@ -568,17 +597,23 @@ namespace BIADKNXLightingDA {
                     sText += " ";
 
                     try {
-                        string sn = AgilorSourceNameAndKNXGroupAddressConvert.getSourceNameByGroupAddress("0x"+GroupAddress.ToString("X"), agilorConnectDeviceName.Text);
+                        // connect mysql to get agilor rtdb name
+                        mysqlAdapter = new MySqlDataAdapter("select * from " + mysql_table_name + " where knx_group_address = '0x" + GroupAddress.ToString("X") + "'", mysqlConn);
+                        mysqlAdapter.Fill(mysqlDataSet);
+                        string agilor_rtdb_name = mysqlDataSet.Tables[0].Rows[0]["agilor_rtdb_name"].ToString();
+                        string agilor_aci_name = mysqlDataSet.Tables[0].Rows[0]["agilor_aci_name"].ToString();
 
-                        foreach (var device in rtdbs)
+                        rtdb.WriteValue(new Agilor.Interface.Val.Value(agilor_rtdb_name, nVal));
+
+                        if (agilor_aci_name.Contains("__"))
                         {
-                            if (device.Value.WriteValue(new Agilor.Interface.Val.Value(sn, nVal)))
+                            string[] sArray = agilor_aci_name.Split(new string[] { "__" }, StringSplitOptions.RemoveEmptyEntries);
+                            if(sArray.Length == 2)
                             {
-                                break;
+                                rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
                             }
                         }
 
-                        //rtdb.WriteValue(new Agilor.Interface.Val.Value(sn, nVal));
                     } catch (Exception ex) {
                         loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
                     }
@@ -618,19 +653,27 @@ namespace BIADKNXLightingDA {
                     sText += nVal.ToString("X");
                     sText += " ";
 
-                    try {
-                        string sn = AgilorSourceNameAndKNXGroupAddressConvert.getSourceNameByGroupAddress("0x" + GroupAddress.ToString("X"), agilorConnectDeviceName.Text);
+                    try
+                    {
+                        // connect mysql to get agilor rtdb name
+                        mysqlAdapter = new MySqlDataAdapter("select * from " + mysql_table_name + " where knx_group_address = '0x" + GroupAddress.ToString("X") + "'", mysqlConn);
+                        mysqlAdapter.Fill(mysqlDataSet);
+                        string agilor_rtdb_name = mysqlDataSet.Tables[0].Rows[0]["agilor_rtdb_name"].ToString();
+                        string agilor_aci_name = mysqlDataSet.Tables[0].Rows[0]["agilor_aci_name"].ToString();
 
-                        foreach (var device in rtdbs)
+                        rtdb.WriteValue(new Agilor.Interface.Val.Value(agilor_rtdb_name, nVal));
+
+                        if (agilor_aci_name.Contains("__"))
                         {
-                            if (device.Value.WriteValue(new Agilor.Interface.Val.Value(sn, nVal)))
+                            string[] sArray = agilor_aci_name.Split(new string[] { "__" }, StringSplitOptions.RemoveEmptyEntries);
+                            if (sArray.Length == 2)
                             {
-                                break;
+                                rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
                             }
                         }
-
-                        //rtdb.WriteValue(new Agilor.Interface.Val.Value(sn, nVal));
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
                     }
                 }
@@ -802,15 +845,12 @@ namespace BIADKNXLightingDA {
                     _nGroupDataWritePriority_config = knxWrite._nPriority;
                     _nGroupDataWriteRoutingCount_config = knxWrite._nRoutingCount;
                     _bGroupDataWriteLessthan7bits_config = knxWrite._bLessthan7bits;
+                    MessageBox.Show("KNX Write Configuration Changed.");
                 }
             } catch (Exception ex) {
                 loggingBox.AppendText("kNXWriteConfigurationToolStripMenuItem_Click: Error write config!" + ex.Message + "\r\n");
                 //MessageBox.Show("kNXWriteConfigurationToolStripMenuItem_Click: Error write config!" + ex.Message);
             }
-        }
-
-        private void sourcenameGroupAddressToolStripMenuItem_Click(object sender, EventArgs e) {
-            new SourcenameToGroupAddress().Show();
         }
 
         private void connectAgilorDBACI_Click(object sender, EventArgs e)
@@ -847,41 +887,29 @@ namespace BIADKNXLightingDA {
 
         private void loggingBox_TextChanged(object sender, EventArgs e)
         {
-            if (loggingBox.TextLength > 1000) loggingBox.Clear();
+            if (loggingBox.TextLength > 10000) loggingBox.Clear();
         }
 
-        private void disconnectAgilorDB_Click(object sender, EventArgs e)
+        private void mySQLConnectConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (rtdbs.ContainsKey(agilorConnectDeviceName.Text))
+            try
             {
-                rtdbs[agilorConnectDeviceName.Text].ValueReceived -= Rtdb_ValueReceived;
-                rtdbs[agilorConnectDeviceName.Text].Close();
-                rtdbs.Remove(agilorConnectDeviceName.Text);
-
-                less7bitsFlag.Remove(agilorConnectDeviceName.Text);
-
-                loggingBox.AppendText("Disconnet Device: '" + agilorConnectDeviceName.Text + "' finished.\r\n");
-            } else
-            {
-                //MessageBox.Show("Device: '" + agilorConnectDeviceName.Text + "' not connected!\r\n");
-                loggingBox.AppendText("Device: '" + agilorConnectDeviceName.Text + "' not connected!\r\n");
-                return;
+                MySQLConnConfig mysqlConfig = new MySQLConnConfig();
+                if (mysqlConfig.ShowDialog() == DialogResult.OK)
+                {
+                    //get inserted values
+                    mysql_server_ip = mysqlConfig.mysql_server_ip;
+                    mysql_user_id = mysqlConfig.mysql_user_id;
+                    mysql_password = mysqlConfig.mysql_password;
+                    mysql_database_name = mysqlConfig.mysql_database_name;
+                    mysql_table_name = mysqlConfig.mysql_table_name;
+                    MessageBox.Show("MySQL Connect Configuration Changed.");
+                }
             }
-        }
-
-        private void disconnectAgilorDBALL_Click(object sender, EventArgs e)
-        {
-            foreach (var device in rtdbs)
+            catch (Exception ex)
             {
-                device.Value.ValueReceived -= Rtdb_ValueReceived;
-                device.Value.Close();
-                loggingBox.AppendText("Disconnet device '" + device.Key +  "' finished.\r\n");
+                loggingBox.AppendText("mySQLConnectConfigurationToolStripMenuItem_Click: Error config!" + ex.Message + "\r\n");
             }
-            rtdbs.Clear();
-
-            less7bitsFlag.Clear();
-
-            loggingBox.AppendText("Disconnet all device finished.\r\n");
         }
     }
 }
