@@ -57,6 +57,7 @@
         /// 使用代码编辑器修改此方法的内容。
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -95,6 +96,7 @@
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.kNXWriteConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mySQLConnectConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -479,6 +481,12 @@
             this.mySQLConnectConfigurationToolStripMenuItem.Text = "MySQL Connect Configuration";
             this.mySQLConnectConfigurationToolStripMenuItem.Click += new System.EventHandler(this.mySQLConnectConfigurationToolStripMenuItem_Click);
             // 
+            // notifyIcon
+            // 
+            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+            this.notifyIcon.Text = "KNX Interface";
+            this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -493,6 +501,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "KNX Interface";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -546,6 +555,7 @@
         private System.Windows.Forms.ToolStripMenuItem aCIConnectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rTDBConnectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mySQLConnectConfigurationToolStripMenuItem;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
     }
 }
 

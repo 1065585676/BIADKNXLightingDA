@@ -914,5 +914,24 @@ namespace BIADKNXLightingDA {
                 loggingBox.AppendText("mySQLConnectConfigurationToolStripMenuItem_Click: Error config!" + ex.Message + "\r\n");
             }
         }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            if(this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                notifyIcon.Visible = true;
+            }
+        }
+
+        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            if(this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = true;
+                this.WindowState = FormWindowState.Normal;
+                notifyIcon.Visible = false;
+            }
+        }
     }
 }
