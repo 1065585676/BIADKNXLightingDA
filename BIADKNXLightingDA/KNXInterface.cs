@@ -133,7 +133,7 @@ namespace BIADKNXLightingDA {
                 ReloadConfigFile();
             }
 
-            rtdb.WriteValue(value);
+            //rtdb.WriteValue(value);
 
             var msg = "RECEIVED:\r\n"
                     + "Name:" + value.Name + "\r\n"
@@ -142,7 +142,7 @@ namespace BIADKNXLightingDA {
                     + "State:" + value.State + "\r\n"
                     + "Time:" + value.Time + "\r\n"
                     + "\r\n";
-            loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { msg });
+            //loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { msg });
 
             try
             {
@@ -157,7 +157,7 @@ namespace BIADKNXLightingDA {
                     string[] sArray = agilor_aci_name.Split(new string[] { "__" }, StringSplitOptions.RemoveEmptyEntries);
                     if (sArray.Length == 2)
                     {
-                        rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
+                        //rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
                     }
                 }
 
@@ -599,6 +599,7 @@ namespace BIADKNXLightingDA {
                     try {
                         // connect mysql to get agilor rtdb name
                         mysqlAdapter = new MySqlDataAdapter("select * from " + mysql_table_name + " where knx_group_address = '0x" + GroupAddress.ToString("X") + "'", mysqlConn);
+                        mysqlDataSet.Clear();
                         mysqlAdapter.Fill(mysqlDataSet);
                         string agilor_rtdb_name = mysqlDataSet.Tables[0].Rows[0]["agilor_rtdb_name"].ToString();
                         string agilor_aci_name = mysqlDataSet.Tables[0].Rows[0]["agilor_aci_name"].ToString();
@@ -613,14 +614,14 @@ namespace BIADKNXLightingDA {
                                 rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
                             }
                         }
-
-                    } catch (Exception ex) {
-                        loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
+                        loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { sText + "\r\n" });
+                    }
+                    catch (Exception ex) {
+                        //loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
                     }
                 }
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { sText + "\r\n" });
             } catch (Exception ex) {
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
+                //loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
             }
         }
         /// <summary>
@@ -652,11 +653,13 @@ namespace BIADKNXLightingDA {
                     sText += "0x";
                     sText += nVal.ToString("X");
                     sText += " ";
+                    sText += " ";
 
                     try
                     {
                         // connect mysql to get agilor rtdb name
                         mysqlAdapter = new MySqlDataAdapter("select * from " + mysql_table_name + " where knx_group_address = '0x" + GroupAddress.ToString("X") + "'", mysqlConn);
+                        mysqlDataSet.Clear();
                         mysqlAdapter.Fill(mysqlDataSet);
                         string agilor_rtdb_name = mysqlDataSet.Tables[0].Rows[0]["agilor_rtdb_name"].ToString();
                         string agilor_aci_name = mysqlDataSet.Tables[0].Rows[0]["agilor_aci_name"].ToString();
@@ -671,15 +674,15 @@ namespace BIADKNXLightingDA {
                                 rtdb.WriteValue(new Agilor.Interface.Val.Value(sArray[0], sArray[1]));
                             }
                         }
+                        loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { sText + "\r\n" });
                     }
                     catch (Exception ex)
                     {
-                        loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
+                        //loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
                     }
                 }
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { sText + "\r\n" });
             } catch (Exception ex) {
-                loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
+                //loggingBox.Invoke(new Action<string>(loggingBox.AppendText), new object[] { ex.Message + "\r\n" });
             }
         }
         /// <summary>
